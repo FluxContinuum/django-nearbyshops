@@ -1,0 +1,20 @@
+version: "3"
+services:
+  # to initialize postgres again, execute "docker-compose rm"
+  db:
+    image: kartoza/postgis:9.6-2.4
+    environment:
+      POSTGRES_USER: user001
+      POSTGRES_PASS: 123456789
+      POSTGRES_DBNAME: gis
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    links:
+      - db
+    restart: on-failure
+    command: bash -c 'sleep 5; echo "Waiting for postgres to initialize..."; sleep 5; python manage.py makemigrations; python manage.py migrate; python manage.py runserver 0.0.0.0:8000'
